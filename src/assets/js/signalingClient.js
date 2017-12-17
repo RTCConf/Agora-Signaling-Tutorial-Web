@@ -5,9 +5,10 @@ class SignalingClient{
         this.appid = appid;
         this.appcert = appcertificate;
         this.uid = null;
+        this.localAccount = null;
 
         this.onMessageInstantReceive = null;
-        this.onInviteEndByPeer = null;
+        this.onMessageChannelReceive = null;
     }
 
     login(account){
@@ -34,12 +35,17 @@ class SignalingClient{
 
         session.onMessageInstantReceive = $.proxy(this._onMessageInstantReceive, this);
         this.session = session;
+        this.localAccount = account;
 
         return deferred.promise();
     }
 
     sendMessage(account, text){
         this.session.messageInstantSend(account, text);
+    }
+
+    broadcastMessage(text){
+        this.channel && this.channel.messageChannelSend(text);
     }
 
     join(channelName){
@@ -57,6 +63,7 @@ class SignalingClient{
             deferred.reject(ecode);
         };
 
+        channel.onMessageChannelReceive = $.proxy(this._onMessageChannelReceive, this);
         this.channel = channel;
 
         return deferred.promise();
@@ -81,7 +88,13 @@ class SignalingClient{
 
     _onMessageInstantReceive(account, uid, msg){
         if(this.onMessageInstantReceive){
-            this.onMessageInstantReceive(account, msg, "instant");
+            this.onMessageInstantReceive(account, msg);
+        }
+    }
+
+    _onMessageChannelReceive(account, uid, msg){
+        if(this.onMessageChannelReceive && this.localAccount !== account){
+            this.onMessageChannelReceive(this.channel.name, msg);
         }
     }
 }

@@ -35,7 +35,7 @@
                 chatsContainer.html("");
                 let html = "";
                 for (var i = 0; i < this.chats.length; i++) {
-                    html += "<li name=\"" + this.chats[i].id + "\" type=\" + this.chats[i].type +\">";
+                    html += "<li name=\"" + this.chats[i].id + "\" type=\"" + this.chats[i].type + "\" account=\"" + this.chats[i].account +"\">";
                     html += "<div class=\"title\">" + this.chats[i].account + "</div>";
                     html += "<div class=\"desc\">" + this.chats[i].type + "</div>";
                     html += "</li>";
@@ -45,16 +45,31 @@
                 $(".chat-history li").off("click").on("click", function () {
                     let mid = $(this).attr("name");
                     let type = $(this).attr("type");
+                    let account = $(this).attr("account");
                     if(type === "channel"){
-                        // client.signal.join()
-                        client.showMessage(mid);
+                        client.signal.leave().done(function(){
+                            client.signal.join(account).done(function(){
+                                client.showMessage(mid);
+                            });
+                        });
                     } else {
                         client.showMessage(mid);
                     }
                 });
 
                 if (this.chats.length > 0) {
-                    this.showMessage(this.chats[0].id);
+                    let type = this.chats[0].type;
+                    let account = this.chats[0].account;
+                    let mid = this.chats[0].id;
+                    if(type === "channel"){
+                        client.signal.leave().done(function(){
+                            client.signal.join(account).done(function(){
+                                client.showMessage(mid);
+                            });
+                        });
+                    } else {
+                        client.showMessage(mid);
+                    }
                 }
             }
 
@@ -99,7 +114,7 @@
                 if (this.current_conversation.type === "instant") {
                     this.signal.sendMessage(this.current_conversation.account, text);
                 } else {
-                    this.signal.messageChannelSend(text);
+                    this.signal.broadcastMessage(text);
                 }
 
                 $(".chat-messages").append(this.buildMsg(text, true, msg_item.ts));
@@ -182,7 +197,17 @@
                     }
                 });
 
-                signal.onMessageInstantReceive = $.proxy(this.onReceiveMessage, this);
+                signal.onMessageInstantReceive = $.proxy(this.onMessageInstantReceive, this);
+                signal.onMessageChannelReceive = $.proxy(this.onMessageChannelReceive, this);
+            }
+
+
+            onMessageInstantReceive(account, msg){
+                this.onReceiveMessage(account, msg, "instant");
+            }
+
+            onMessageChannelReceive(account, msg){
+                this.onReceiveMessage(account, msg, "channel");
             }
 
             onReceiveMessage(account, msg, type) {
@@ -249,11 +274,11 @@
         const appid = "672fac5cd7194d26908a15900c6d6484", appcert = "a31c1044fe4040ba8d1af4ba3f5165f9";
         let localAccount = Browser.getParameterByName("account");
         let signal = new SignalingClient(appid, appcert);
-        let client = new Client(signal, localAccount);
         let channelName = Math.random() * 10000 + "";
         //by default call btn is disabled
         signal.login(localAccount).done(_ => {
             //once logged in, enable the call btn
+            let client = new Client(signal, localAccount);
         });
     });
 }(jQuery));
