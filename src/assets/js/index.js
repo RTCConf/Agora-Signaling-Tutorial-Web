@@ -13,11 +13,7 @@
             //join btn clicked
             e.preventDefault();
             var account = $("#account-name").val() || "";
-
-            if (!/^[^\s]*$/.test(account)) {
-                
-            }
-            if (checkAccount(account.trim())) {
+            if (checkAccount(account)) {
                 //account has to be a non empty numeric value
                 window.location.href = `meeting.html?account=${account}`;
             } else {

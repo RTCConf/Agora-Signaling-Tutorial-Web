@@ -33,7 +33,7 @@ class SignalingClient{
         }, this);
 
         session.onLogout = $.proxy(() => {
-            window.location.href = '/';
+            window.location.href = 'index.html';
         })
 
         session.onMessageInstantReceive = $.proxy(this._onMessageInstantReceive, this);

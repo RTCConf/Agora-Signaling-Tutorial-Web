@@ -140,10 +140,19 @@
 
                 dialog.find(".confirmBtn").off("click").on("click", (e) => {
                     //dialog confirm
-                    let account = $(".conversation-target-field").val().trim();
+                    let account = $(".conversation-target-field").val();
                     let type = $(':radio[name="type"]').filter(':checked').val();
 
                     // validation
+                    let isValid = () => {
+                        if (!account) return false // empty
+                        if (!/^[^\s]*$/.test(account)) {
+                            // has space character
+                            return false
+                        }
+                        return true
+                    }
+
                     let isExisted = () => {
                         return client.chats.some(function(item){
                             return item.account === account && item.type === type;
@@ -153,7 +162,7 @@
                         return type==='instant' && account === localAccount
                     }
 
-                    if (!account) {
+                    if (!isValid()) {
                         $(".conversation-target-field").siblings(".invalid-feedback").html("请输入一个合法的名字.")
                         $(".conversation-target-field").removeClass("is-invalid").addClass("is-invalid");
                     } else if (isSelf()) {
@@ -163,6 +172,8 @@
                         $(".conversation-target-field").siblings(".invalid-feedback").html("该聊天已存在.")
                         $(".conversation-target-field").removeClass("is-invalid").addClass("is-invalid");
                     } else {
+                        $(".conversation-target-field").removeClass("is-invalid")
+                        dialog.find(".conversation-target-field").val('')
                         dialog.modal('hide');
                         client.chats.splice(0, 0, { id: new Date().getTime(), account: account, type: type });
                         client.updateLocalStorage();
@@ -175,6 +186,13 @@
                     //dialog confirm
                     dialog.modal('hide');
                     deferred.reject();
+                });
+
+                dialog.find(".conversation-target-field").off("keydown").on("keydown", function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                        dialog.find(".confirmBtn").click()
+                    }
                 });
 
                 //start modal
