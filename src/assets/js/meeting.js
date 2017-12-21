@@ -3,11 +3,11 @@
         class Client {
             //construct a meeting client with signal client and rtc client
             constructor(sclient, localAccount) {
+                this.cleanData();
                 this.signal = sclient;
                 this.localAccount = localAccount;
                 this.current_conversation = null;
                 this.current_msgs = null;
-                // this.cleanData();
                 this.loadFromLocalStorage();
                 this.updateChatList();
 
@@ -106,6 +106,7 @@
             }
 
             sendMessage(text) {
+                if (!text.trim()) return false // empty
                 if (!this.current_msgs) {
                     return;
                 }
@@ -116,9 +117,9 @@
                 } else {
                     this.signal.broadcastMessage(text);
                 }
-
-                $(".chat-messages").append(this.buildMsg(text, true, msg_item.ts));
-
+                let chatMsgContainer = $(".chat-messages")
+                chatMsgContainer.append(this.buildMsg(text, true, msg_item.ts));
+                chatMsgContainer.scrollTop(chatMsgContainer[0].scrollHeight)
                 this.updateMessageMap();
             }
 
@@ -139,19 +140,26 @@
 
                 dialog.find(".confirmBtn").off("click").on("click", (e) => {
                     //dialog confirm
-                    let account = $(".conversation-target-field").val();
+                    let account = $(".conversation-target-field").val().trim();
                     let type = $(':radio[name="type"]').filter(':checked').val();
-                    let conversations = client.chats.filter(function(item){
-                        return item.account === account;
-                    });
+
+                    // validation
+                    let isExisted = () => {
+                        return client.chats.some(function(item){
+                            return item.account === account && item.type === type;
+                        });
+                    } 
+                    let isSelf = () => {
+                        return type==='instant' && account === localAccount
+                    }
 
                     if (!account) {
                         $(".conversation-target-field").siblings(".invalid-feedback").html("请输入一个合法的名字.")
                         $(".conversation-target-field").removeClass("is-invalid").addClass("is-invalid");
-                    } else if (`${account}` === `${localAccount}`) {
+                    } else if (isSelf()) {
                         $(".conversation-target-field").siblings(".invalid-feedback").html("你不能跟自己聊天.")
                         $(".conversation-target-field").removeClass("is-invalid").addClass("is-invalid");
-                    } else if (conversations.length > 0){
+                    } else if (isExisted()){
                         $(".conversation-target-field").siblings(".invalid-feedback").html("该聊天已存在.")
                         $(".conversation-target-field").removeClass("is-invalid").addClass("is-invalid");
                     } else {
@@ -182,6 +190,10 @@
 
                 $(".new-conversation-btn").off("click").on("click", function () {
                     client.addConversation();
+                });
+
+                $(".logout-btn").off("click").on("click", function () {
+                    signal.logout()
                 });
 
                 $(':radio[name="type"]').change(function () {
@@ -231,19 +243,21 @@
                     let msg_item = { ts: new Date(), text: msg, account: account };
                     msgs.push(msg_item);
                     this.updateMessageMap(conversation, msgs);
-
+                    let chatMsgContainer = $(".chat-messages")
                     if (conversation.id+"" === this.current_conversation.id+"") {
-                        $(".chat-messages").append(client.buildMsg(msg, false, msg_item.ts));
+                        chatMsgContainer.append(client.buildMsg(msg, false, msg_item.ts));
+                        chatMsgContainer.scrollTop(chatMsgContainer[0].scrollHeight)
+
                     }
                 }
             }
 
             buildMsg(msg, me, ts){
                 let html = "";
-                let className = me ? "message right" : "message";
+                let className = me ? "message right clearfix" : "message clearfix";
                 html += "<li class=\"" + className +"\">";
                 html += "<img src=\"https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/1_copy.jpg\">";
-                html += "<div class=\"bubble\">" + msg + "<div class=\"corner\"></div>";
+                html += "<div class=\"bubble\">" + msg ;
                 html += "<span>" + this.parseTwitterDate(ts) + "</span></div></li>";
 
                 return html;

@@ -18,7 +18,6 @@ class SignalingClient{
         Logger.log('Logging in ' + account);
         //starts login
         let session = this.signal.login(account, appcert ? SignalingToken.get(appid, appcert, account, 1):"");
-        
         //if success
         session.onLoginSuccess = $.proxy(uid => {
             Logger.log('login success ' + uid);
@@ -33,11 +32,19 @@ class SignalingClient{
             deferred.reject();
         }, this);
 
+        session.onLogout = $.proxy(() => {
+            window.location.href = '/';
+        })
+
         session.onMessageInstantReceive = $.proxy(this._onMessageInstantReceive, this);
         this.session = session;
         this.localAccount = account;
 
         return deferred.promise();
+    }
+
+    logout () {
+        this.session.logout()
     }
 
     sendMessage(account, text){

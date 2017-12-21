@@ -98,6 +98,10 @@ body>#snackbar-container{
   margin: 0;
 }
 
+.chat-history {
+  overflow-y: auto;
+}
+
 .chat-history>li{
   width: 100%;
   height: 100px;
@@ -169,6 +173,8 @@ body>#snackbar-container{
   float:left;
   margin-left: 7px;
   min-width: 52px;
+  max-width: 50%;
+  word-wrap: break-word;
 }
 .chat-messages .message.right .bubble{
   float:right;
@@ -202,6 +208,7 @@ body>#snackbar-container{
     color: #aab8c2;
     font-size: 11px;
     position: absolute;
+    white-space: nowrap;
     right: 0;
     bottom: -22px;
 }
