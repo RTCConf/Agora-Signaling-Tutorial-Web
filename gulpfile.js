@@ -53,12 +53,13 @@ gulp.task('jsmin', function() {
 		}))
         .pipe(gulp.dest('./dist/assets/js'));
 
-    return gulp.src('./src/assets/vendor/*.js')
+    return gulp.src(['./src/assets/vendor/*.js', './config.js'])
         .pipe(order([
             'jquery*.js',
             'adapter.js',
             'popper.js',
             'bootstrap-material-design.min.js',
+            'config.js',
             '*.js'
         ]))
         .pipe(concat("vendor-all.js"))

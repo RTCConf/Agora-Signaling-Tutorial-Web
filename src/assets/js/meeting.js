@@ -303,7 +303,7 @@
             }
         }
 
-        const appid = "672fac5cd7194d26908a15900c6d6484", appcert = "a31c1044fe4040ba8d1af4ba3f5165f9";
+        const appid = AGORA_APP_ID || '' , appcert = AGORA_CERTIFICATE_ID || '';
         let localAccount = Browser.getParameterByName("account");
         let signal = new SignalingClient(appid, appcert);
         let channelName = Math.random() * 10000 + "";
