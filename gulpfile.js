@@ -88,6 +88,7 @@ gulp.task('htmlmin', function() {
 
 gulp.task('watch', function() {
     gulp.watch('src/**/*', ['build']);
+    gulp.watch('config.js', ['build']);
 });
 
 gulp.task("build", ['jsmin', 'cssmin', 'htmlmin', 'images', 'fonts', 'sound']);

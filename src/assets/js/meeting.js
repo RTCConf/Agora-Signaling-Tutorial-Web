@@ -94,7 +94,6 @@
                 }
                 this.current_conversation = conversation[0];
                 this.current_msgs = this.messages[this.current_conversation.id] || [];
-
                 $('#message-to-send').off("keydown").on("keydown", function (e) {
                     if (e.keyCode == 13) {
                         e.preventDefault();
@@ -103,14 +102,16 @@
                     }
                 });
 
-                $(".chat-messages").html("");
+                let chatMsgContainer = $(".chat-messages")
+                chatMsgContainer.html("");
                 let html = "";
                 for (let i = 0; i < this.current_msgs.length; i++) {
                     html += this.buildMsg(this.current_msgs[i].text, this.current_msgs[i].account === this.localAccount, this.current_msgs[i].ts);
                 }
                 $(".chat-history li").removeClass("selected");
                 $(".chat-history li[name=" + mid + "]").addClass("selected");
-                $(".chat-messages").html(html);
+                chatMsgContainer.html(html);
+                chatMsgContainer.scrollTop(chatMsgContainer[0].scrollHeight)
 
                 if (conversation[0].type === 'instant') {
                     let [query, account] = ['io.agora.signal.user_query_user_status', conversation[0].account]
@@ -148,12 +149,19 @@
                 chatMsgContainer.append(this.buildMsg(text, true, msg_item.ts));
                 chatMsgContainer.scrollTop(chatMsgContainer[0].scrollHeight)
                 this.updateMessageMap();
+                this.showMessage(this.current_conversation.id)
+
             }
 
             updateMessageMap(c, m) {
                 let conversation = c || this.current_conversation;
                 let msgs = m || this.current_msgs;
                 this.messages[conversation.id] = msgs;
+                this.chats.filter((item) => {
+                    if (item.id === conversation.id && item.type === conversation.type) {
+                        item.lastMoment = new Date()
+                    }
+                })
                 this.updateLocalStorage();
             }
 
@@ -291,6 +299,7 @@
                     let chatMsgContainer = $(".chat-messages")
                     if (conversation.id+"" === this.current_conversation.id+"") {
                         chatMsgContainer.append(client.buildMsg(msg, false, msg_item.ts));
+                        this.showMessage(this.current_conversation.id)
                         chatMsgContainer.scrollTop(chatMsgContainer[0].scrollHeight)
 
                     }
@@ -307,6 +316,26 @@
 
                 return html;
             }
+
+            // compareByLastMoment (ts) {
+            //     let lastMoment = null
+            //     this.chats.forEach(item => {
+            //         if (item.id === this.current_conversation.id && item.type === this.current_conversation.type) {
+            //             lastMoment = item.lastMoment
+            //         }
+            //     })
+            //     if (!lastMoment) {
+            //         let time = new Date()
+            //         return time.toDateString()+' '+time.toLocaleTimeString()
+            //     }
+            //     let diff = Math.floor((ts-lastMoment)/1000)
+            //     if (diff<120) {
+            //         return ''
+            //     }
+            //     else {
+            //         return new Date().toLocaleTimeString()
+            //     }
+            // }
 
             parseTwitterDate(tdate) {
                 var system_date = new Date(Date.parse(tdate));
@@ -331,9 +360,12 @@
         }
 
         const appid = AGORA_APP_ID || '' , appcert = AGORA_CERTIFICATE_ID || '';
+        if (!appid) {
+            alert('App ID missing!')
+        }
         let localAccount = Browser.getParameterByName("account");
         let signal = new SignalingClient(appid, appcert);
-        let channelName = Math.random() * 10000 + "";
+        // let channelName = Math.random() * 10000 + "";
         //by default call btn is disabled
         signal.login(localAccount).done(_ => {
             //once logged in, enable the call btn
