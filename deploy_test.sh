@@ -1,5 +1,5 @@
 #!/bin/sh
-deployDir=/home/devops/web_demo/project/open_duo_test
+deployDir=/home/devops/web_demo/project/signaling_tutorial_test
 ServerName=${@:$OPTIND:1}
 
 Rev="$(git rev-parse HEAD)"
