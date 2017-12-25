@@ -14,6 +14,16 @@
                 this.subscribeEvents();
             }
 
+            invoke(func, args, cb){
+                let session = this.signal.session
+                session && session.invoke(func, args, function(err, val){
+                    if(err){
+                        console.error(val.reason);
+                    } else {
+                        cb && cb(err, val);
+                    }
+                });
+            }
             cleanData() {
                 localStorage.setItem("chats", "");
                 localStorage.setItem("messages", "");
@@ -85,7 +95,6 @@
                 this.current_conversation = conversation[0];
                 this.current_msgs = this.messages[this.current_conversation.id] || [];
 
-
                 $('#message-to-send').off("keydown").on("keydown", function (e) {
                     if (e.keyCode == 13) {
                         e.preventDefault();
@@ -102,7 +111,25 @@
                 $(".chat-history li").removeClass("selected");
                 $(".chat-history li[name=" + mid + "]").addClass("selected");
                 $(".chat-messages").html(html);
-                $(".detail .nav").html(conversation[0].account);
+
+                if (conversation[0].type === 'instant') {
+                    let [query, account] = ['io.agora.signal.user_query_user_status', conversation[0].account]
+                    let peerStatus
+                    client.invoke(query, {account}, function(err, val){
+                        //
+                        if (val.status) {
+                            peerStatus = 'Online'
+                        }
+                        else {
+                            peerStatus = 'Offline'
+                        }
+                        $(".detail .nav").html(conversation[0].account+`(${peerStatus})`);
+                    });
+                }
+                else {
+                    $(".detail .nav").html(conversation[0].account);
+                }
+                
             }
 
             sendMessage(text) {
@@ -275,7 +302,7 @@
                 let className = me ? "message right clearfix" : "message clearfix";
                 html += "<li class=\"" + className +"\">";
                 html += "<img src=\"https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/1_copy.jpg\">";
-                html += "<div class=\"bubble\">" + msg ;
+                html += "<div class=\"bubble\">" + msg + "<div class=\"corner\"></div>";
                 html += "<span>" + this.parseTwitterDate(ts) + "</span></div></li>";
 
                 return html;
@@ -311,6 +338,7 @@
         signal.login(localAccount).done(_ => {
             //once logged in, enable the call btn
             let client = new Client(signal, localAccount);
+            $('#localAccount').html(localAccount)
         });
     });
 }(jQuery));
