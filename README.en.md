@@ -2,11 +2,11 @@
 
 *其他语言版本： [简体中文](README.md)*
 
-This repository will help you learn how to use Agora Signal SDK to realize a simple chat web application, like wechat.
+This repository will help you learn how to use Agora Signaling SDK to realize a simple chat web application, like wechat.
 
 With this sample app, you can:
 
-- Login into chat app
+- Login signaling server
 - Input another user's account and start a private chat
 - Show your chat log
 - Join group chats
@@ -14,7 +14,7 @@ With this sample app, you can:
 - Leave the group
 - Logout
 
-Agora Signal SDK supports iOS / Android / Web. You can find demos of these platform here:
+Agora Signaling SDK supports iOS / Android / Web. You can find demos of these platform here:
 
 - Android: https://github.com/AgoraIO/Agora-Signaling-Tutorial-Android
 - IOS    : https://github.com/AgoraIO/Agora-Signaling-Tutorial-iOS-Swift
