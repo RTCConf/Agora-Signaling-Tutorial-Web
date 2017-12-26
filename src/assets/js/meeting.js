@@ -149,7 +149,7 @@
                 chatMsgContainer.append(this.buildMsg(text, true, msg_item.ts));
                 chatMsgContainer.scrollTop(chatMsgContainer[0].scrollHeight)
                 this.updateMessageMap();
-                this.showMessage(this.current_conversation.id)
+                // this.showMessage(this.current_conversation.id)
 
             }
 
@@ -299,7 +299,7 @@
                     let chatMsgContainer = $(".chat-messages")
                     if (conversation.id+"" === this.current_conversation.id+"") {
                         chatMsgContainer.append(client.buildMsg(msg, false, msg_item.ts));
-                        this.showMessage(this.current_conversation.id)
+                        // this.showMessage(this.current_conversation.id)
                         chatMsgContainer.scrollTop(chatMsgContainer[0].scrollHeight)
 
                     }
@@ -308,6 +308,10 @@
 
             buildMsg(msg, me, ts){
                 let html = "";
+                let timeStr = this.compareByLastMoment(ts)
+                if (timeStr) {
+                    html += `<div>${timeStr}</div>`
+                }
                 let className = me ? "message right clearfix" : "message clearfix";
                 html += "<li class=\"" + className +"\">";
                 html += "<img src=\"https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/1_copy.jpg\">";
@@ -317,25 +321,25 @@
                 return html;
             }
 
-            // compareByLastMoment (ts) {
-            //     let lastMoment = null
-            //     this.chats.forEach(item => {
-            //         if (item.id === this.current_conversation.id && item.type === this.current_conversation.type) {
-            //             lastMoment = item.lastMoment
-            //         }
-            //     })
-            //     if (!lastMoment) {
-            //         let time = new Date()
-            //         return time.toDateString()+' '+time.toLocaleTimeString()
-            //     }
-            //     let diff = Math.floor((ts-lastMoment)/1000)
-            //     if (diff<120) {
-            //         return ''
-            //     }
-            //     else {
-            //         return new Date().toLocaleTimeString()
-            //     }
-            // }
+            compareByLastMoment (ts) {
+                let lastMoment = null
+                this.chats.forEach(item => {
+                    if (item.id === this.current_conversation.id && item.type === this.current_conversation.type) {
+                        lastMoment = item.lastMoment
+                    }
+                })
+                if (!lastMoment) {
+                    let time = new Date()
+                    return time.toDateString()+' '+time.toLocaleTimeString()
+                }
+                let diff = Math.floor((ts-lastMoment)/1000)
+                if (diff<120) {
+                    return ''
+                }
+                else {
+                    return new Date().toLocaleTimeString()
+                }
+            }
 
             parseTwitterDate(tdate) {
                 var system_date = new Date(Date.parse(tdate));
