@@ -19,7 +19,9 @@ Agora Signaling SDK supports iOS / Android / Web. You can find demos of these pl
 - Android: https://github.com/AgoraIO/Agora-Signaling-Tutorial-Android
 - IOS    : https://github.com/AgoraIO/Agora-Signaling-Tutorial-iOS-Swift
 - Linux    : https://github.com/AgoraIO/Agora-Signaling-Tutorial-Linux
-- MacOS  : https://github.com/AgoraIO/Agora-Signaling-Tutorial-macOS-Swift
+- MacOS  : https://github.com/AgoraIO/Agora-Signaling-Tutorial-macOS-Swift  
+- Windows: https://github.com/AgoraIO/Agora-Signaling-Tutorial-Windows
+- Java   : https://github.com/AgoraIO/Agora-Signaling-Tutorial-Java
 
 
 ## Running the App
