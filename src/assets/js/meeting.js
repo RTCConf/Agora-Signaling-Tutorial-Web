@@ -315,7 +315,7 @@
                 let className = me ? "message right clearfix" : "message clearfix";
                 html += "<li class=\"" + className +"\">";
                 html += "<img src=\"https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/1_copy.jpg\">";
-                html += "<div class=\"bubble\">" + msg + "<div class=\"corner\"></div>";
+                html += "<div class=\"bubble\">" + Utils.safe_tags_replace(msg) + "<div class=\"corner\"></div>";
                 html += "<span>" + this.parseTwitterDate(ts) + "</span></div></li>";
 
                 return html;

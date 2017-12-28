@@ -40,3 +40,19 @@ Browser.getParameterByName = (name, url) => {
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
+
+class Utils{}
+
+const REPLACE_TABLE = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;'
+}
+
+Utils._replaceTag = (tag) => {
+    return REPLACE_TABLE[tag] || tag
+}
+
+Utils.safe_tags_replace = (str) => {
+    return str.replace(/[&<>]/g, Utils._replaceTag)
+}

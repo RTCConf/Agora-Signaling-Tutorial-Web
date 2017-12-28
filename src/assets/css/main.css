@@ -202,12 +202,11 @@ body>#snackbar-container{
   height: 0;
   border-top: 7px solid transparent;
   border-bottom: 7px solid transparent;
-  border-left: 7px solid white;
+  border-left: 7px solid #b2e281;
   border-right: initial;
   left: initial;
   right: -6px;
   bottom: 10px;
-
 }
 .bubble span{
     color: #aab8c2;
