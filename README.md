@@ -35,7 +35,7 @@ const AGORA_APP_ID = 'abcdefg'
 const AGORA_CERTIFICATE_ID = 'hijklmn'
 ```
 
-在项目根目录使用npm安装项目依赖，并使用gulp打包出发布文件  
+将您获得的SDK文件'AgoraSig-*.js'置于'/src/assets/vendor'目录下。在项目根目录使用npm安装项目依赖，并使用gulp打包出发布文件  
 
 ``` bash
 # install dependency

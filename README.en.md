@@ -35,7 +35,7 @@ const AGORA_APP_ID = 'abcdefg'
 const AGORA_CERTIFICATE_ID = 'hijklmn'
 ```
 
-Run npm to install dependency and use gulp to publish dist
+Then put the file 'AgoraSig-*.js' you got under the path '/src/assets/vendor'. Run npm to install dependency and use gulp to publish dist
 
 ``` bash
 # install dependency
