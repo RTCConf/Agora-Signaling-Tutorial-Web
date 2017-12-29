@@ -17,7 +17,7 @@ class SignalingClient{
         let appcert = this.appcert;
         Logger.log('Logging in ' + account);
         //starts login
-        let session = this.signal.login(account, appcert ? SignalingToken.get(appid, appcert, account, 1):"");
+        let session = this.signal.login(account, '_no_need_token');
         //if success
         session.onLoginSuccess = $.proxy(uid => {
             Logger.log('login success ' + uid);
