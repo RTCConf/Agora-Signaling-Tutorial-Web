@@ -4,8 +4,6 @@ var gulp = require('gulp'),
     cssnano = require('gulp-cssnano'),
     concat = require("gulp-concat"),
     rename = require('gulp-rename'),
-    imagemin = require('gulp-imagemin'),
-    pngquant = require('imagemin-pngquant'),
     order = require('gulp-order'),
     babel = require('gulp-babel'),
     rev = require('gulp-rev'),
@@ -19,11 +17,6 @@ gulp.task('clean', function() {
 
 gulp.task('images', function() {
     return gulp.src(['src/images/*', 'src/assets/*.png'])
-        .pipe(imagemin({
-            progressive: true,
-            svgoPlugins: [{ removeViewBox: false }],
-            use: [pngquant()]
-        }))
         .pipe(gulp.dest('dist/assets/images'));
 });
 
