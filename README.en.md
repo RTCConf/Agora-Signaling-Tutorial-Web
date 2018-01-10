@@ -38,6 +38,8 @@ const AGORA_CERTIFICATE_ID = 'hijklmn'
 Then put the file 'AgoraSig-*.js' you got under the path '/src/assets/vendor'. Run npm to install dependency and use gulp to publish dist
 
 ``` bash
+# install gulp-cli for the first time
+npm install gulp-cli -g
 # install dependency
 npm install
 # generate dist
