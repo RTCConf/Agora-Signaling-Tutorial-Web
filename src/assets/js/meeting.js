@@ -198,13 +198,13 @@
                     }
 
                     if (!isValid()) {
-                        $(".conversation-target-field").siblings(".invalid-feedback").html("请输入一个合法的名字.")
+                        $(".conversation-target-field").siblings(".invalid-feedback").html("Please input a valid name.")
                         $(".conversation-target-field").removeClass("is-invalid").addClass("is-invalid");
                     } else if (isSelf()) {
-                        $(".conversation-target-field").siblings(".invalid-feedback").html("你不能跟自己聊天.")
+                        $(".conversation-target-field").siblings(".invalid-feedback").html("You cannot chat with yourself.")
                         $(".conversation-target-field").removeClass("is-invalid").addClass("is-invalid");
                     } else if (isExisted()){
-                        $(".conversation-target-field").siblings(".invalid-feedback").html("该聊天已存在.")
+                        $(".conversation-target-field").siblings(".invalid-feedback").html("Existed.")
                         $(".conversation-target-field").removeClass("is-invalid").addClass("is-invalid");
                     } else {
                         $(".conversation-target-field").removeClass("is-invalid")
@@ -254,10 +254,10 @@
                     var field = $(".conversation-target-field");
                     switch (type) {
                         case "instant":
-                            field.attr("placeholder", "输入聊天对象账号");
+                            field.attr("placeholder", "Input someone's account");
                             break;
                         case "channel":
-                            field.attr("placeholder", "输入聊天频道");
+                            field.attr("placeholder", "Input a channel name");
                             break;
                     }
                 });
