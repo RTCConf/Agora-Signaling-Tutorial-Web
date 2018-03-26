@@ -57,11 +57,12 @@
                     let type = $(this).attr("type");
                     let account = $(this).attr("account");
                     if(type === "channel"){
-                        client.signal.leave().done(function(){
-                            client.signal.join(account).done(function(){
+                        client.signal.leave().then(() => {
+                            client.signal.join(account).then(() => {
                                 client.showMessage(mid);
                             });
                         });
+
                     } else {
                         client.showMessage(mid);
                     }
@@ -72,11 +73,12 @@
                     let account = this.chats[0].account;
                     let mid = this.chats[0].id;
                     if(type === "channel"){
-                        client.signal.leave().done(function(){
-                            client.signal.join(account).done(function(){
+                        client.signal.leave().then(() => {
+                            client.signal.join(account).then(() =>{
                                 client.showMessage(mid);
                             });
                         });
+
                     } else {
                         client.showMessage(mid);
                     }
@@ -246,7 +248,9 @@
                 });
 
                 $(".logout-btn").off("click").on("click", function () {
-                    signal.logout()
+                    signal.logout().then(() => {
+                        window.location.href = 'index.html'
+                    })
                 });
 
                 $(':radio[name="type"]').change(function () {
@@ -262,17 +266,12 @@
                     }
                 });
 
-                signal.onMessageInstantReceive = $.proxy(this.onMessageInstantReceive, this);
-                signal.onMessageChannelReceive = $.proxy(this.onMessageChannelReceive, this);
-            }
-
-
-            onMessageInstantReceive(account, msg){
-                this.onReceiveMessage(account, msg, "instant");
-            }
-
-            onMessageChannelReceive(account, msg){
-                this.onReceiveMessage(account, msg, "channel");
+                signal.sessionEmitter.onMessageInstantReceive = (account, msg) => {
+                    this.onReceiveMessage(account, msg, 'instant')
+                }
+                signal.channelEmitter.onMessageChannelReceive = (account, msg) => {
+                    this.onReceiveMessage(account, msg, 'channel')
+                }
             }
 
             onReceiveMessage(account, msg, type) {
@@ -371,7 +370,7 @@
         let signal = new SignalingClient(appid, appcert);
         // let channelName = Math.random() * 10000 + "";
         //by default call btn is disabled
-        signal.login(localAccount).done(_ => {
+        signal.login(localAccount).then(() => {
             //once logged in, enable the call btn
             let client = new Client(signal, localAccount);
             $('#localAccount').html(localAccount)

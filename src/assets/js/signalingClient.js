@@ -1,107 +1,138 @@
-class SignalingClient{
-    constructor(appid, appcertificate){
-        this.signal = Signal(appid);
-        this.channel = null;
-        this.appid = appid;
-        this.appcert = appcertificate;
-        this.uid = null;
-        this.localAccount = null;
-
-        this.onMessageInstantReceive = null;
-        this.onMessageChannelReceive = null;
+/**
+ * @description wrapper for Agora Signaling SDK
+ * @description transfer some action to Promise and use Event instead of Callback
+ */
+class SignalingClient {
+    constructor(appId, appcertificate) {
+        this._appId = appId
+        this._appcert = appcertificate
+        // init signal using signal sdk
+        this.signal = Signal(appId) // eslint-disable-line 
+        // init event emitter for channel/session/call
+        this.channelEmitter = mitt()
+        this.sessionEmitter = mitt()
+        this.callEmitter = mitt()
     }
 
-    login(account){
-        let deferred = $.Deferred();
-        let appid = this.appid;
-        let appcert = this.appcert;
-        Logger.log('Logging in ' + account);
-        //starts login
-        let session = this.signal.login(account, '_no_need_token');
-        //if success
-        session.onLoginSuccess = $.proxy(uid => {
-            Logger.log('login success ' + uid);
-            this.uid = uid;
-            deferred.resolve();
-        }, this);
-
-        //if fail
-        session.onLoginFailed = $.proxy(ecode => {
-            Logger.log('login failed ' + ecode);
-            this.session = null
-            deferred.reject();
-        }, this);
-
-        session.onLogout = $.proxy(() => {
-            window.location.href = 'index.html';
+    /**
+     * @description login agora signaling server and init 'session'
+     * @description use sessionEmitter to resolve session's callback
+     * @param {String} account   
+     * @param {*} token default to be omitted
+     * @returns {Promise}
+     */
+    login(account, token = '_no_need_token') {
+        this._account = account
+        return new Promise((resolve, reject) => {
+            this.session = this.signal.login(account, token);
+            // proxy callback on session to sessionEmitter
+            [
+                'onLoginSuccess', 'onError', 'onLoginFailed', 'onLogout',
+                'onMessageInstantReceive', 'onInviteReceived'
+            ].map(event => {
+                return this.session[event] = (...args) => {
+                    this.sessionEmitter.emit(event, ...args)
+                }
+            });
+            // Promise.then
+            this.sessionEmitter.on('onLoginSuccess', (uid) => {
+                this._uid = uid
+                resolve(uid)
+            })
+            // Promise.catch
+            this.sessionEmitter.on('onLoginFailed', (...args) => {
+                reject(...args)
+            })
         })
-
-        session.onMessageInstantReceive = $.proxy(this._onMessageInstantReceive, this);
-        this.session = session;
-        this.localAccount = account;
-
-        return deferred.promise();
     }
 
-    logout () {
-        this.session.logout()
+    /**
+     * @description logout agora signaling server
+     * @returns {Promise}
+     */
+    logout() {
+        return new Promise((resolve, reject) => {
+            this.session.logout()
+            this.sessionEmitter.on('onLogout', (...args) => {
+                resolve(...args)
+            })
+        })
     }
 
-    sendMessage(account, text){
-        this.session.messageInstantSend(account, text);
+    /**
+     * @description join channel
+     * @description use channelEmitter to resolve channel's callback
+     * @param {String} channel   
+     * @returns {Promise}
+     */
+    join(channel) {
+        this._channel = channel
+        return new Promise((resolve, reject) => {
+            if (!this.session) {
+                throw {
+                    Message: '"session" must be initialized before joining channel'
+                }
+            }
+            this.channel = this.session.channelJoin(channel);
+            // proxy callback on channel to channelEmitter
+            [
+                'onChannelJoined',
+                'onChannelJoinFailed',
+                'onChannelLeaved',
+                'onChannelUserJoined',
+                'onChannelUserLeaved',
+                'onChannelUserList',
+                'onChannelAttrUpdated',
+                'onMessageChannelReceive'
+            ].map(event => {
+                return this.channel[event] = (...args) => {
+                    this.channelEmitter.emit(event, ...args)
+                }
+            });
+            // Promise.then
+            this.channelEmitter.on('onChannelJoined', (...args) => {
+                resolve(...args)
+            })
+            // Promise.catch
+            this.channelEmitter.on('onChannelJoinFailed', (...args) => {
+                reject(...args)
+            })
+        })
     }
 
-    broadcastMessage(text){
+    /**
+     * @description leave channel
+     * @returns {Promise}
+     */
+    leave() {
+        return new Promise((resolve, reject) => {
+            if (this.channel) {
+                this.channel.channelLeave()
+                this.channelEmitter.on('onChannelLeaved', (...args) => {
+                    resolve(...args)
+                })
+            } else {
+                resolve()
+            }
+        })
+    }
+
+    /**
+     * @description send p2p message
+     * @description if you want to send an object, use JSON.stringify
+     * @param {String} peerAccount 
+     * @param {String} text 
+     */
+    sendMessage(peerAccount, text) {
+        this.session && this.session.messageInstantSend(peerAccount, text);
+    }
+
+    /**
+     * @description broadcast message in the channel
+     * @description if you want to send an object, use JSON.stringify
+     * @param {String} text 
+     */
+    broadcastMessage(text) {
         this.channel && this.channel.messageChannelSend(text);
-    }
-
-    join(channelName){
-        let deferred = $.Deferred()
-        Logger.log(`Joining channel ${channelName}`);
-
-        let channel = this.session.channelJoin(channelName);
-        channel.onChannelJoined = _ => {
-            Logger.log('channel.onChannelJoined');
-            deferred.resolve();
-        };
-        
-        channel.onChannelJoinFailed = ecode => {
-            Logger.log(`channel.onChannelJoinFailed ${ecode}`);
-            deferred.reject(ecode);
-        };
-
-        channel.onMessageChannelReceive = $.proxy(this._onMessageChannelReceive, this);
-        this.channel = channel;
-
-        return deferred.promise();
-    }
-
-    leave(){
-        let deferred = $.Deferred();
-        let channel = this.channel;
-
-        if(channel === null){
-            return deferred.resolve().promise();
-        }
-
-        channel.onChannelLeaved = $.proxy(ecode => {
-            Logger.log('channel.onChannelLeaved');
-            this.channel = null;
-            deferred.resolve();
-        }, this);
-        channel.channelLeave();
-        return deferred;
-    }
-
-    _onMessageInstantReceive(account, uid, msg){
-        if(this.onMessageInstantReceive){
-            this.onMessageInstantReceive(account, msg);
-        }
-    }
-
-    _onMessageChannelReceive(account, uid, msg){
-        if(this.onMessageChannelReceive && this.localAccount !== account){
-            this.onMessageChannelReceive(this.channel.name, msg);
-        }
     }
 }
