@@ -8,7 +8,8 @@ var gulp = require('gulp'),
     babel = require('gulp-babel'),
     rev = require('gulp-rev'),
     revCollector = require('gulp-rev-collector'),
-    del = require('del');
+    del = require('del'),
+    connect = require('gulp-connect');
 
 
 gulp.task('clean', function() {
@@ -98,12 +99,19 @@ gulp.task('watch', function() {
     gulp.watch('config.js', ['build']);
 });
 
-gulp.task('prod', ['jsmin', 'cssmin', 'htmlmin', 'images', 'fonts', 'sound'], () => {
+gulp.task('connect', function () {
+    connect.server({
+        root: 'dist',
+        port: 8888
+    });
+});
+
+gulp.task('build', ['jsmin', 'cssmin', 'htmlmin', 'images', 'fonts', 'sound'], () => {
     gulp.start('rev')
 })
 
-gulp.task("build", ['clean'], () => {
-    gulp.start('prod')
+gulp.task("dist", ['clean'], () => {
+    gulp.start('build')
 });
 
-gulp.task("default", ['watch']);
+gulp.task("default", ['build', 'connect', 'watch']);
