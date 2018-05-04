@@ -9,9 +9,9 @@ class SignalingClient {
         // init signal using signal sdk
         this.signal = Signal(appId) // eslint-disable-line 
         // init event emitter for channel/session/call
-        this.channelEmitter = mitt()
-        this.sessionEmitter = mitt()
-        this.callEmitter = mitt()
+        this.channelEmitter = new EventEmitter()
+        this.sessionEmitter = new EventEmitter()
+        this.callEmitter = new EventEmitter()
     }
 
     /**
