@@ -276,6 +276,18 @@
                         this.onReceiveMessage(signal.channel.name, msg, 'channel')
                     }
                 })
+
+                signal.channelEmitter.on('onChannelUserLeaved', (account, uid) => {
+                    client.invoke('io.agora.signal.channel_query_num',{'name':signal.channel.name}, (err, val) => {
+                        $(".detail .nav").html(`${signal.channel.name}(${val.num})`);
+                    })
+                })
+
+                signal.channelEmitter.on('onChannelUserJoined', (account, uid) => {
+                    client.invoke('io.agora.signal.channel_query_num',{'name':signal.channel.name}, (err, val) => {
+                        $(".detail .nav").html(`${signal.channel.name}(${val.num})`);
+                    })
+                })
             }
 
             onReceiveMessage(account, msg, type) {
