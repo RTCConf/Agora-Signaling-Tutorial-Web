@@ -130,7 +130,9 @@
                     });
                 }
                 else {
-                    $(".detail .nav").html(conversation[0].account);
+                    client.invoke('io.agora.signal.channel_query_num',{'name':conversation[0].account}, (err, val) => {
+                        $(".detail .nav").html(`${conversation[0].account}(${val.num})`);
+                    })
                 }
                 
             }
@@ -266,12 +268,26 @@
                     }
                 });
 
-                signal.sessionEmitter.onMessageInstantReceive = (account, msg) => {
+                signal.sessionEmitter.on('onMessageInstantReceive', (account, uid, msg) => {
                     this.onReceiveMessage(account, msg, 'instant')
-                }
-                signal.channelEmitter.onMessageChannelReceive = (account, msg) => {
-                    this.onReceiveMessage(account, msg, 'channel')
-                }
+                })
+                signal.channelEmitter.on('onMessageChannelReceive', (account, uid, msg) => {
+                    if (account !== signal._account) {
+                        this.onReceiveMessage(signal.channel.name, msg, 'channel')
+                    }
+                })
+
+                signal.channelEmitter.on('onChannelUserLeaved', (account, uid) => {
+                    client.invoke('io.agora.signal.channel_query_num',{'name':signal.channel.name}, (err, val) => {
+                        $(".detail .nav").html(`${signal.channel.name}(${val.num})`);
+                    })
+                })
+
+                signal.channelEmitter.on('onChannelUserJoined', (account, uid) => {
+                    client.invoke('io.agora.signal.channel_query_num',{'name':signal.channel.name}, (err, val) => {
+                        $(".detail .nav").html(`${signal.channel.name}(${val.num})`);
+                    })
+                })
             }
 
             onReceiveMessage(account, msg, type) {
