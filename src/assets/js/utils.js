@@ -13,19 +13,6 @@ Logger.log = m => {
     console.log(m)
 }
 
-
-/*
- * Toast
- */
-class Message{
-
-}
-
-Message.show = m => {
-    $.snackbar({content: m, timeout: 3000})
-}
-
-
 /*
  * Browser Utils
  */

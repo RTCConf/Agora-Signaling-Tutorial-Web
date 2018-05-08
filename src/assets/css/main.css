@@ -20,11 +20,6 @@ body{
     background-attachment: fixed, fixed, fixed;
 }
 
-body>#snackbar-container{
-  align-items: flex-start;
-  bottom: 10px;
-}
-
 .version-label {
   position: absolute;
   right: 10px;
