@@ -1,5 +1,4 @@
 (function ($) {
-    $(() => {
         class Client {
             //construct a meeting client with signal client and rtc client
             constructor(sclient, localAccount) {
@@ -391,5 +390,4 @@
             let client = new Client(signal, localAccount);
             $('#localAccount').html(localAccount)
         });
-    });
 }(jQuery));

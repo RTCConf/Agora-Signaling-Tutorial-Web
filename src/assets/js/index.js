@@ -1,4 +1,4 @@
-
+(function($){
     const checkAccount = (account) => {
         if (!account) return false // empty
         if (!/^[^\s]*$/.test(account)) {
@@ -21,3 +21,5 @@
     });
 
     $('#sdk-version').html(new Signal().getSDKVersion())
+}(jQuery))
+
