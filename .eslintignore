@@ -12,4 +12,4 @@ yarn-error.log
 *.sln
 *.sh
 
-agora.config.local.js
+static/

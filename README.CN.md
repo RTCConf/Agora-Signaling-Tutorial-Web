@@ -27,7 +27,7 @@ Agora 信令 SDK 支持 iOS / Android / Web 等多个平台，你可以查看对
 ## 运行示例程序
 首先在 [Agora.io 注册](https://dashboard.agora.io/cn/signup/) 注册账号，并创建自己的测试项目，获取到 AppID。
 然后选择测试项目里的编辑，App Certificate 点击启用，根据操作拿到App Certificate。
-将 AppID 和App Certificate 填写进 "config.js" 中的两个常量中
+将 AppID 和App Certificate 填写进 "static/agora.config.js" 中的两个常量中
 
 ``` javascript
 const AGORA_APP_ID = 'abcdefg'
@@ -35,24 +35,26 @@ const AGORA_APP_ID = 'abcdefg'
 const AGORA_CERTIFICATE_ID = 'hijklmn'
 ```
 
-将您获得的SDK文件'AgoraSig-*.js'置于'/src/assets/vendor'目录下。在项目根目录使用npm安装项目依赖，并使用gulp打包出发布文件  
+将您获得的信令SDK文件重命名为'AgoraSig.js'置于'/static/'目录下。在项目根目录使用npm安装项目依赖，并打包出发布文件（或者您也可以使用dev模式，创建一个热重载的开发环境，默认情况下在浏览器中打开localhost:8080）
 
 ``` bash
-# install gulp-cli for the first time
-npm install gulp-cli -g
 # install dependency
 npm install
+# run in dev mode
+npm run dev
 # generate dist
-gulp build
+npm run build
 ```
 根目录下会生成dist目录，注意**请勿直接使用浏览器将html当作静态文件使用文件协议打开，必须使用http／https协议**，也就是说请部署服务器或使用 Python simpleHTTPServer 模块。
 
 ### 关于Token
-在登录信令服务器时可提供一个参数token，一般由服务器计算提供作为身份凭证，默认不使用，如需使用，请重写signalingClient.js中的login函数  
+在登录信令服务器时可提供一个参数token，一般由服务器计算提供作为身份凭证，默认不使用，如需使用，请提供参数给signalingClient.js中的login函数  
 
 ``` javascript
 //... 
-let session = this.signal.login(account,'_no_need_token');
+login(account, token = '_no_need_token') {
+  // ...
+}
 //... 
 ```
 
