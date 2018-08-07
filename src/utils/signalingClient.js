@@ -13,7 +13,6 @@ export default class SignalingClient {
     // init event emitter for channel/session/call
     this.channelEmitter = new EventEmitter();
     this.sessionEmitter = new EventEmitter();
-    this.callEmitter = new EventEmitter();
   }
 
   /**
@@ -41,12 +40,12 @@ export default class SignalingClient {
         });
       });
       // Promise.then
-      this.sessionEmitter.on('onLoginSuccess', uid => {
+      this.sessionEmitter.once('onLoginSuccess', uid => {
         this._uid = uid;
         resolve(uid);
       });
       // Promise.catch
-      this.sessionEmitter.on('onLoginFailed', (...args) => {
+      this.sessionEmitter.once('onLoginFailed', (...args) => {
         reject(...args);
       });
     });
@@ -59,7 +58,7 @@ export default class SignalingClient {
   logout() {
     return new Promise((resolve, reject) => {
       this.session.logout();
-      this.sessionEmitter.on('onLogout', (...args) => {
+      this.sessionEmitter.once('onLogout', (...args) => {
         resolve(...args);
       });
     });
@@ -96,11 +95,12 @@ export default class SignalingClient {
         });
       });
       // Promise.then
-      this.channelEmitter.on('onChannelJoined', (...args) => {
+      this.channelEmitter.once('onChannelJoined', (...args) => {
         resolve(...args);
       });
       // Promise.catch
-      this.channelEmitter.on('onChannelJoinFailed', (...args) => {
+      this.channelEmitter.once('onChannelJoinFailed', (...args) => {
+        this.channelEmitter.removeAllListeners()
         reject(...args);
       });
     });
@@ -114,7 +114,8 @@ export default class SignalingClient {
     return new Promise((resolve, reject) => {
       if (this.channel) {
         this.channel.channelLeave();
-        this.channelEmitter.on('onChannelLeaved', (...args) => {
+        this.channelEmitter.once('onChannelLeaved', (...args) => {
+          this.channelEmitter.removeAllListeners()
           resolve(...args);
         });
       } else {

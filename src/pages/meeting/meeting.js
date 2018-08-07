@@ -329,7 +329,7 @@ class Client {
       this.onReceiveMessage(account, msg, 'instant');
     });
     signal.channelEmitter.on('onMessageChannelReceive', (account, uid, msg) => {
-      if (account !== signal._account) {
+      if (account !== signal.account) {
         this.onReceiveMessage(signal.channel.name, msg, 'channel');
       }
     });
@@ -378,8 +378,7 @@ class Client {
       this.updateMessageMap(conversation, msgs);
       let chatMsgContainer = $('.chat-messages');
       if (String(conversation.id) === String(this.current_conversation.id)) {
-        chatMsgContainer.append(client.buildMsg(msg, false, msg_item.ts));
-        // This.showMessage(this.current_conversation.id)
+        this.showMessage(this.current_conversation.id)
         chatMsgContainer.scrollTop(chatMsgContainer[0].scrollHeight);
       }
     }
